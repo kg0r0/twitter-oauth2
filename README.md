@@ -7,7 +7,7 @@ Express.js middleware implementation for Twitter OAuth2 Client.
 TBD
 
 ## Usage
-:warning: This library hasn't been published on NPM yet. 
+TBD
 ```js
 const twitterOAuth2 = require('twitter-oauth2').TwitterOAuth2;
 const cookieSession = require('cookie-session');
