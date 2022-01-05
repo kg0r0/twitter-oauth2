@@ -1,7 +1,7 @@
 {
   "name": "twitter-oauth2",
-  "version": "0.0.1",
-  "description": "Twitter OAuth2 Client Library",
+  "version": "0.0.2",
+  "description": "Express.js middleware implementation for Twitter OAuth2 Client.",
   "main": "lib/src/index.js",
   "scripts": {
     "build": "tsc",
@@ -11,6 +11,10 @@
     "type": "git",
     "url": "git+https://github.com/kg0r0/twitter-oauth2.git"
   },
+  "keywords": [
+    "oauth2",
+    "twitter"
+  ],
   "author": "kg0r0",
   "license": "MIT",
   "bugs": {
