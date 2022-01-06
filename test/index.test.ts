@@ -20,7 +20,7 @@ app.use(index.TwitterOAuth2({
 test('TwitterOAuth2 redirects the resource owner to twitter.', done => {
   request(app)
     .get('/')
-    .send()
+    .expect('Location', /^https:\/\/twitter.com\/i\/oauth2\/authorize.*/)
     .expect(
       302, done
     )
