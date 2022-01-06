@@ -21,7 +21,15 @@ export interface TwitterOAuth2Client {
   type_of_app?: string;
 }
 
-module.exports.TwitterOAuth2 = function TwitterOAuth2(options: any) {
+export interface Options {
+  client_id?: string
+  client_secret?: string;
+  redirect_uri?: string;
+  scope?: string
+  type_of_app?: 'confidential' | 'public' 
+}
+
+module.exports.TwitterOAuth2 = function TwitterOAuth2(options: Options) {
   return twitterOAuth2Handler.bind(undefined, options);
 };
 
@@ -34,13 +42,13 @@ module.exports.TwitterOAuth2 = function TwitterOAuth2(options: any) {
  * @param next 
  * @returns 
  */
-async function twitterOAuth2Handler(options: any, req: Request, res: Response, next: NextFunction) {
+async function twitterOAuth2Handler(options: Options, req: Request, res: Response, next: NextFunction) {
   try {
     const clientID = options.client_id || process.env.CLIENT_ID;
     if (typeof clientID != 'string')
       throw new Error('client_id must be a string');
     const clientSecret = options.client_secret || process.env.CLIENT_SECRET;
-    const redirectURI = process.env.REDIRECT_URI;
+    const redirectURI = options.redirect_uri || process.env.REDIRECT_URI;
     if (typeof redirectURI != 'string')
       throw new Error('redirect_uri must be a string');
 
@@ -89,7 +97,6 @@ function authorizationRequest(req: Request, client: BaseClient, options: any): s
   const codeChallenge = generators.codeChallenge(codeVerifier);
   const url: string = client.authorizationUrl({
     response_type: 'code',
-    // TODO: Read from configuration file
     scope: options.scope || 'tweet.read users.read offline.access',
     state,
     code_challenge: codeChallenge,
