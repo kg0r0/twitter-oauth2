@@ -80,7 +80,7 @@ async function twitterOAuth2Handler(options: Options, req: Request, res: Respons
       const tokenSet = await client.oauthCallback(clientConfig.redirect_uri, params, { code_verifier: codeVerifier, state }, { exchangeBody: { client_id: clientConfig.client_id } });
       req.session.tokenSet = tokenSet;
       if (typeof req.session.originalUrl != 'string')
-        throw new Error('originalUrl is must be string')
+        throw new Error('originalUrl must be a string')
       return res.redirect(req.session.originalUrl);
     }
   } catch (err) {
