@@ -8,6 +8,9 @@ Express.js middleware implementation for Twitter OAuth2 Client.
 
 ## Install
 TBD
+```bash
+$ npm i twitter-oauth2
+```
 
 ## Usage
 TBD
