@@ -16,31 +16,33 @@ $ npm i twitter-oauth2
 ## Usage
 TBD
 ```js
-const twitterOAuth2 = require('twitter-oauth2').TwitterOAuth2;
-const cookieSession = require('cookie-session');
-const express = require('express');
-const crypto = require('crypto');
-const cookieParser = require('cookie-parser');
+import express from 'express';
+import session from 'express-session';
+const twitterOAuth2 =  require('twitter-oauth2');
+const app: express.Express = express();
 
-const app = express();
+declare module 'express-session' {
+  export interface Session {
+    tokenSet: Object
+  }
+}
 
-app.use(cookieSession({
-  name: 'session',
-  keys: [crypto.randomBytes(32).toString('hex')]
+app.use(session({
+  name: 'COOKIE-NAME',
+  secret: 'YOUR-SECRETKEY',
+  cookie: {
+    sameSite: 'lax'
+  },
+  resave: false,
+  saveUninitialized: true
 }))
-
-app.use(cookieParser())
 
 app.use(twitterOAuth2({}))
 
-app.get('/', (req, res, next) => {
+app.get('/', (req: express.Request, res: express.Response) => {
   console.log('received tokens %j', req.session.tokenSet);
   res.send('Hello World!');
-});
-
-const server = app.listen(3000, () => {
-  console.log('Node.js is listening to PORT: ' + server.address().port);
-});
+})
 ```
 
 ## License
