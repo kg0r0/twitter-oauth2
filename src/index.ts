@@ -29,7 +29,7 @@ export interface Options {
   type_of_app?: 'confidential' | 'public' 
 }
 
-module.exports = function TwitterOAuth2(options: Options) {
+export const twitterOAuth2 = function (options: Options) {
   return twitterOAuth2Handler.bind(undefined, options);
 };
 
@@ -91,7 +91,7 @@ async function twitterOAuth2Handler(options: Options, req: Request, res: Respons
   return
 }
 
-function authorizationRequest(req: Request, client: BaseClient, options: any): string {
+function authorizationRequest(req: Request, client: BaseClient, options: Options): string {
   const state = generators.state();
   const codeVerifier = generators.codeVerifier();
   const codeChallenge = generators.codeChallenge(codeVerifier);
