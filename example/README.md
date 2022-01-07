@@ -2,7 +2,7 @@
 
 ```bash
 $ npm install
-$ node index.js
+$ node run dev 
 ```
 To run the example, add the following environment variables.
 ```

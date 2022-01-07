@@ -29,7 +29,7 @@ export interface Options {
   type_of_app?: 'confidential' | 'public' 
 }
 
-module.exports.TwitterOAuth2 = function TwitterOAuth2(options: Options) {
+module.exports = function TwitterOAuth2(options: Options) {
   return twitterOAuth2Handler.bind(undefined, options);
 };
 
