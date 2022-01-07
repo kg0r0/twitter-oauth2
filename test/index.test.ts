@@ -1,7 +1,7 @@
+import { twitterOAuth2 } from '../lib'
 const express = require('express');
 const cookieSession = require('cookie-session');
 const cookieParser = require('cookie-parser');
-const twitterOAuth2 = require('../src/index');
 const request = require('supertest');
 
 const app = express();

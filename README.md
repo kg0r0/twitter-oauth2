@@ -8,7 +8,6 @@
 Express.js middleware implementation for Twitter OAuth2 Client.
 
 ## Install
-TBD
 ```bash
 $ npm i twitter-oauth2
 ```
@@ -18,18 +17,12 @@ TBD
 ```js
 import express from 'express';
 import session from 'express-session';
-const twitterOAuth2 =  require('twitter-oauth2');
+import { twitterOAuth2 } from 'twitter-oauth2';
 const app: express.Express = express();
 
-declare module 'express-session' {
-  export interface Session {
-    tokenSet: Object
-  }
-}
-
 app.use(session({
-  name: 'COOKIE-NAME',
-  secret: 'YOUR-SECRETKEY',
+  name: 'YOUR-SESSION-NAME',
+  secret: 'YOUR-SECRET',
   cookie: {
     sameSite: 'lax'
   },

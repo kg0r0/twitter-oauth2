@@ -1,16 +1,10 @@
 import express from 'express';
 import session from 'express-session';
+import { twitterOAuth2 } from '../../lib/';
 const crypto = require('crypto');
-const twitterOAuth2 =  require('../../lib/');
 const app: express.Express = express();
 
 const PORT = 3000;
-
-declare module 'express-session' {
-  export interface Session {
-    tokenSet: Object
-  }
-}
 
 app.use(session({
   name: 'EXAMPLE',
