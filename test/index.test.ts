@@ -1,4 +1,4 @@
-import { twitterOAuth2, Options } from '../lib'
+import { twitterOAuth2, Options } from '../src'
 import express from 'express';
 import session from 'express-session';
 const request = require('supertest');
