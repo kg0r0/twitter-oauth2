@@ -1,4 +1,4 @@
-import { twitterOAuth2, Options } from '../src'
+import { twitterOAuth2, TwitterOAuth2Options } from '../src'
 import express from 'express';
 import session from 'express-session';
 const request = require('supertest');
@@ -22,7 +22,7 @@ test('TwitterOAuth2 return a 403 status code when an asynchronous request is sen
     .expect(403, done)
 })
 
-function App(twitterOAuth2Options?: Options, sessionOptions?: any) {
+function App(twitterOAuth2Options?: TwitterOAuth2Options, sessionOptions?: any) {
   const app: express.Express = express()
   app.use(session(sessionOptions || {
     name: 'TEST',
