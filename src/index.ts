@@ -28,7 +28,12 @@ export interface Options {
   scope?: string
   type_of_app?: 'confidential' | 'public'
 }
-
+/**
+ * Returns a new middleware.
+ * 
+ * @param {Options} options
+ * @returns {function} middleware
+ */
 export const twitterOAuth2 = function (options: Options) {
   return twitterOAuth2Handler.bind(undefined, options);
 };
@@ -36,10 +41,10 @@ export const twitterOAuth2 = function (options: Options) {
 /**
  * Returns a middleware that checks whether an resource owner is authorized.
  *  
- * @param options 
- * @param req 
- * @param res 
- * @param next 
+ * @param {Options} options 
+ * @param {Request} req 
+ * @param {Response} res 
+ * @param {NextFunction} next 
  * @returns 
  */
 async function twitterOAuth2Handler(options: Options, req: Request, res: Response, next: NextFunction) {
