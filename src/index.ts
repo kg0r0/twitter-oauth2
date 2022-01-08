@@ -26,7 +26,7 @@ export interface Options {
   client_secret?: string;
   redirect_uri?: string;
   scope?: string
-  type_of_app?: 'confidential' | 'public' 
+  type_of_app?: 'confidential' | 'public'
 }
 
 export const twitterOAuth2 = function (options: Options) {
@@ -72,6 +72,9 @@ async function twitterOAuth2Handler(options: Options, req: Request, res: Respons
     });
     if (req.session && (!req.session.isRedirected && !req.session.tokenSet)) {
       const url = authorizationRequest(req, client, options)
+      if (req.xhr) {
+        return res.status(403).json({ location: url });
+      }
       return res.redirect(url);
     } else if (req.session && req.session.isRedirected && !req.session.tokenSet) {
       const state = req.session.state;
@@ -81,6 +84,9 @@ async function twitterOAuth2Handler(options: Options, req: Request, res: Respons
       req.session.tokenSet = tokenSet;
       if (typeof req.session.originalUrl != 'string')
         throw new Error('originalUrl must be a string')
+      if (req.xhr) {
+        return res.json({ location: req.session.originalUrl });
+      }
       return res.redirect(req.session.originalUrl);
     }
   } catch (err) {

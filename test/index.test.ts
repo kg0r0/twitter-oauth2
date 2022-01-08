@@ -29,3 +29,11 @@ test('TwitterOAuth2 redirects the resource owner to twitter.', done => {
       302, done
     )
 })
+
+test('TwitterOAuth2 return a 403 status code when an asynchronous request is sent.', done => {
+  request(app)
+    .get('/')
+    .set('X-Requested-With', 'XMLHttpRequest')
+    .expect('Content-Type', 'application/json; charset=utf-8')
+    .expect(403, done)
+})

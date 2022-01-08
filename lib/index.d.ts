@@ -24,4 +24,4 @@ export interface Options {
     scope?: string;
     type_of_app?: 'confidential' | 'public';
 }
-export declare const twitterOAuth2: (options: Options) => (req: Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>, next: NextFunction) => Promise<void>;
+export declare const twitterOAuth2: (options: Options) => (req: Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>, next: NextFunction) => Promise<void | Response<any, Record<string, any>>>;
