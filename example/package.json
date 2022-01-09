@@ -13,6 +13,7 @@
   "author": "kg0r0",
   "license": "MIT",
   "dependencies": {
+    "axios": "^0.24.0",
     "crypto": "^1.0.1",
     "express": "^4.17.2",
     "express-session": "^1.17.2"

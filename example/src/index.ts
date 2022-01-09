@@ -2,6 +2,7 @@ import express from 'express';
 import session from 'express-session';
 import { twitterOAuth2 } from '../../lib/';
 import crypto from 'crypto';
+import axios from 'axios';
 
 const app: express.Express = express();
 
@@ -19,9 +20,16 @@ app.use(session({
 
 app.use(twitterOAuth2({}))
 
-app.get('/', (req: express.Request, res: express.Response) => {
+app.get('/', async (req: express.Request, res: express.Response) => {
+  const tokenSet = req.session.tokenSet;
   console.log('received tokens %j', req.session.tokenSet);
-  res.send('Hello World!');
+  const { data } = await axios.get('https://api.twitter.com/2/users/me', 
+  { 
+    headers: {
+      Authorization: `Bearer ${tokenSet?.access_token}`
+    }
+  });
+  res.send(`Hello ${data.data.username}!`);
 })
 
 app.listen(PORT, () => {
