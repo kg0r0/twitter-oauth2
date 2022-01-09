@@ -39,9 +39,24 @@ export interface TokenRequestOptions {
 /**
  * Returns a new middleware.
  *
- * @param {Options} options
+ * @param {TwitterOAuth2Options} options
  * @returns {function} middleware
  */
 export declare const twitterOAuth2: (options: TwitterOAuth2Options) => (req: Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>, next: NextFunction) => Promise<void | Response<any, Record<string, any>>>;
+/**
+ * Returns a Authorization Request URL.
+ *
+ * @param {BaseClient} client
+ * @param {AuthorizationRequestOptions} options
+ * @returns {string}
+ */
 export declare function authorizationRequest(client: BaseClient, options: AuthorizationRequestOptions): string;
+/**
+ * Returns a Token Response.
+ *
+ * @param {Request} req
+ * @param {BaseClient} client
+ * @param {TokenRequestOptions} options
+ * @returns {Promise<TokenSet>}
+ */
 export declare function tokenRequest(req: Request, client: BaseClient, options: TokenRequestOptions): Promise<TokenSet>;

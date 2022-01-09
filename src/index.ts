@@ -44,7 +44,7 @@ export interface TokenRequestOptions {
 /**
  * Returns a new middleware.
  * 
- * @param {Options} options
+ * @param {TwitterOAuth2Options} options
  * @returns {function} middleware
  */
 export const twitterOAuth2 = function (options: TwitterOAuth2Options) {
@@ -54,7 +54,7 @@ export const twitterOAuth2 = function (options: TwitterOAuth2Options) {
 /**
  * Returns a middleware that checks whether an resource owner is authorized.
  *  
- * @param {Options} options 
+ * @param {TwitterOAuth2Client} options 
  * @param {Request} req 
  * @param {Response} res 
  * @param {NextFunction} next 
@@ -135,6 +135,13 @@ async function twitterOAuth2Handler(options: TwitterOAuth2Options, req: Request,
   return
 }
 
+/**
+ * Returns a Authorization Request URL.
+ * 
+ * @param {BaseClient} client 
+ * @param {AuthorizationRequestOptions} options 
+ * @returns {string}
+ */
 export function authorizationRequest(client: BaseClient, options: AuthorizationRequestOptions): string {
   const url: string = client.authorizationUrl({
     response_type: 'code',
@@ -146,6 +153,14 @@ export function authorizationRequest(client: BaseClient, options: AuthorizationR
   return url;
 }
 
+/**
+ * Returns a Token Response.
+ * 
+ * @param {Request} req 
+ * @param {BaseClient} client 
+ * @param {TokenRequestOptions} options 
+ * @returns {Promise<TokenSet>}
+ */
 export async function tokenRequest(req: Request, client: BaseClient, options: TokenRequestOptions): Promise<TokenSet> {
   const state = options.state;
   const codeVerifier = options.codeVerifier;
