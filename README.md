@@ -44,6 +44,7 @@ app.get('/', async (req: express.Request, res: express.Response) => {
   res.send(`Hello ${data.data.username}!`);
 })
 ```
+See the [example](https://github.com/kg0r0/twitter-oauth2/tree/main/example) for basic usage.
 
 ## License
 
