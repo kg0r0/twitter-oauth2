@@ -1,8 +1,6 @@
 import { Request, Response } from 'express';
 import { NextFunction } from 'connect';
 import { Issuer, generators, IssuerMetadata, BaseClient, TokenSet } from 'openid-client';
-// TODO: Read from configuration file
-// import config from 'config';
 
 declare module 'express-session' {
   export interface SessionData {
