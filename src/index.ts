@@ -62,6 +62,8 @@ export const twitterOAuth2 = function (options: TwitterOAuth2Options) {
  */
 async function twitterOAuth2Handler(options: TwitterOAuth2Options, req: Request, res: Response, next: NextFunction) {
   try {
+    if (!req.session)
+      throw new Error('express-session is not configured');
     const clientID = options.client_id || process.env.CLIENT_ID;
     if (typeof clientID != 'string')
       throw new Error('client_id must be a string');
@@ -88,7 +90,7 @@ async function twitterOAuth2Handler(options: TwitterOAuth2Options, req: Request,
       redirect_uris: [clientConfig.redirect_uri],
       token_endpoint_auth_method: clientConfig.type_of_app == 'public' ? 'none' : 'client_secret_basic',
     });
-    if (req.session && (!req.session.isRedirected && !req.session.tokenSet)) {
+    if ((!req.session.isRedirected && !req.session.tokenSet)) {
       const state = generators.state();
       const codeVerifier = generators.codeVerifier();
       const codeChallenge = generators.codeChallenge(codeVerifier);
@@ -106,7 +108,7 @@ async function twitterOAuth2Handler(options: TwitterOAuth2Options, req: Request,
         return res.status(403).json({ location: url });
       }
       return res.redirect(url);
-    } else if (req.session && req.session.isRedirected && !req.session.tokenSet) {
+    } else if (req.session.isRedirected && !req.session.tokenSet) {
       const state = req.session.state;
       if (typeof state != 'string')
         throw new Error('state must be a string');
