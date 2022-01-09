@@ -1,7 +1,8 @@
 import express from 'express';
 import session from 'express-session';
 import { twitterOAuth2 } from '../../lib/';
-const crypto = require('crypto');
+import crypto from 'crypto';
+
 const app: express.Express = express();
 
 const PORT = 3000;

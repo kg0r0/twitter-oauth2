@@ -2,7 +2,19 @@ import { twitterOAuth2, TwitterOAuth2Options, authorizationRequest } from '../sr
 import { Issuer, BaseClient } from 'openid-client';
 import express from 'express';
 import session from 'express-session';
-const request = require('supertest');
+import request from 'supertest';
+
+interface IssuerOptions {
+  issuer?: string
+  authorization_endpoint?: string
+  token_endpoint?: string
+}
+
+interface ClientOptions {
+    client_id?: string
+    client_secret?: string
+    redirect_uri?: string 
+}
 
 test('TwitterOAuth2 redirects the resource owner to twitter.', done => {
   const app = App();
@@ -33,7 +45,7 @@ test('authorizationRequest returns a authorization request url.', () => {
   expect(url).toBe('https://localhost:5555/oauth2/authorize?client_id=TEST_CLIENT_ID&scope=tweet.read%20users.read%20offline.access&response_type=code&redirect_uri=TEST_REDIRECT_URI&state=TEST_STATE&code_challenge=TEST_CODE_CHALLENGE&code_challenge_method=S256')
 })
 
-function App(twitterOAuth2Options?: TwitterOAuth2Options, sessionOptions?: any) {
+function App(twitterOAuth2Options?: TwitterOAuth2Options, sessionOptions?:session.SessionOptions) {
   const app: express.Express = express()
   app.use(session(sessionOptions || {
     name: 'TEST',
@@ -52,7 +64,7 @@ function App(twitterOAuth2Options?: TwitterOAuth2Options, sessionOptions?: any) 
   return app
 }
 
-function Client(issuerOptions: any, clientOptions: any): BaseClient {
+function Client(issuerOptions: IssuerOptions, clientOptions: ClientOptions): BaseClient {
   const issuer: Issuer = new Issuer({
     issuer: issuerOptions.issuer || 'https://localhost:5555',
     authorization_endpoint: issuerOptions.authorization_endpoint || 'https://localhost:5555/oauth2/authorize',
