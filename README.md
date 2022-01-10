@@ -85,6 +85,14 @@ The [client type](https://datatracker.ietf.org/doc/html/rfc6749#section-2.1) def
 This value was set during the registration process.
 The current default is `confidential`.
 
+#### Error Handling
+Errors raised by this middleware are handled by [the default Express error handler](https://expressjs.com/en/guide/error-handling.html#the-default-error-handler). 
+To write your own error handler, see the Express documentation on writing [Custom error handlers](https://expressjs.com/en/guide/error-handling.html#writing-error-handlers).
+
+## Contributing
+Thanks for your feedback and contribution to this repo!
+Please feel free to open issues and send pull-requests.
+
 ## License
 
 [MIT](LICENSE)
