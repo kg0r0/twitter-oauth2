@@ -14,10 +14,13 @@ declare module 'express-session' {
 
 export interface TwitterOAuth2Options {
   client_id?: string;
+  consumer_key?: string;
   client_secret?: string;
+  consumer_secret?: string;
   redirect_uri?: string;
   scope?: string;
   client_type?: 'confidential' | 'public';
+  grant_type?: 'authorization_code' | 'client_credentials';
 }
 
 export interface AuthorizationRequestOptions {
@@ -41,7 +44,10 @@ export interface TokenRequestOptions {
  * @returns {function} middleware
  */
 export const twitterOAuth2 = function (options: TwitterOAuth2Options) {
-  return twitterOAuth2Handler.bind(undefined, options);
+  if (options.grant_type == 'client_credentials') {
+    return clientCredentialsGrant.bind(undefined, options);
+  }
+  return authorizationCodeGrant.bind(undefined, options);
 };
 
 /**
@@ -53,7 +59,7 @@ export const twitterOAuth2 = function (options: TwitterOAuth2Options) {
  * @param {NextFunction} next 
  * @returns 
  */
-async function twitterOAuth2Handler(options: TwitterOAuth2Options, req: Request, res: Response, next: NextFunction) {
+async function authorizationCodeGrant(options: TwitterOAuth2Options, req: Request, res: Response, next: NextFunction) {
   try {
     if (!req.session)
       throw new Error('express-session is not configured');
@@ -72,7 +78,7 @@ async function twitterOAuth2Handler(options: TwitterOAuth2Options, req: Request,
     }
     const issuer: Issuer = new Issuer(issOpt);
     const client: BaseClient = new issuer.Client({
-      client_id: clientID, 
+      client_id: clientID,
       client_secret: clientSecret,
       redirect_uris: [redirectURI],
       token_endpoint_auth_method: options.client_type == 'public' ? 'none' : 'client_secret_basic',
@@ -122,6 +128,40 @@ async function twitterOAuth2Handler(options: TwitterOAuth2Options, req: Request,
   }
   next();
   return
+}
+
+async function clientCredentialsGrant(options: TwitterOAuth2Options, req: Request, res: Response, next: NextFunction) {
+  try {
+    if (!req.session)
+      throw new Error('express-session is not configured');
+    if (req.session.tokenSet) {
+      next()
+      return
+    }
+    const clientID = options.consumer_key || process.env.CONSUMER_KEY;
+    if (typeof clientID != 'string')
+      throw new Error('consumer_key must be a string');
+    const clientSecret = options.consumer_secret || process.env.CONSUMER_SECRET;
+    if (typeof clientSecret != 'string')
+      throw new Error('consumer_secret must be a string');
+    const issuer = new Issuer({
+      issuer: 'https://twitter.com',
+      token_endpoint: 'https://api.twitter.com/oauth2/token'
+    });
+    const client = new issuer.Client({
+      client_id: clientID,
+      client_secret: clientSecret,
+    });
+    const tokenSet = await client.grant({
+      grant_type: 'client_credentials',
+    })
+    req.session.tokenSet = tokenSet;
+    next();
+    return
+  } catch (err) {
+    next(err);
+    return
+  }
 }
 
 /**
