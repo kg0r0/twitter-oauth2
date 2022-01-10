@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { ErrorRequestHandler } from 'express';
 import session from 'express-session';
 import { twitterOAuth2 } from '../../lib/';
 import crypto from 'crypto';
@@ -7,6 +7,10 @@ import axios from 'axios';
 const app: express.Express = express();
 
 const PORT = 3000;
+
+const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+  res.status(err.status || 500).json({ err: { message: err.message } });
+};
 
 app.use(session({
   name: 'EXAMPLE',
@@ -19,6 +23,8 @@ app.use(session({
 }))
 
 app.use(twitterOAuth2({}))
+
+app.use(errorHandler);
 
 app.get('/', async (req: express.Request, res: express.Response) => {
   const tokenSet = req.session.tokenSet;
