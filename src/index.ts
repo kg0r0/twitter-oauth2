@@ -7,16 +7,9 @@ declare module 'express-session' {
     tokenSet: TokenSet;
     isRedirected: boolean;
     state: string;
-    codeVerifier: string;
+    code_verifier: string;
     originalUrl: string;
   }
-}
-
-export interface TwitterOAuth2Client {
-  client_id: string;
-  client_secret?: string;
-  redirect_uri: string;
-  type_of_app?: string;
 }
 
 export interface TwitterOAuth2Options {
@@ -30,14 +23,14 @@ export interface TwitterOAuth2Options {
 export interface AuthorizationRequestOptions {
   state: string;
   scope?: string;
-  codeChallenge: string;
-  codeChallengeMethod: string;
+  code_challenge: string;
+  code_challenge_method: string;
 }
 
 export interface TokenRequestOptions {
   client_id: string;
   redirect_uri: string;
-  codeVerifier: string;
+  code_verifier: string;
   state: string;
 }
 
@@ -54,7 +47,7 @@ export const twitterOAuth2 = function (options: TwitterOAuth2Options) {
 /**
  * Returns a middleware that checks whether an resource owner is authorized.
  *  
- * @param {TwitterOAuth2Client} options 
+ * @param {TwitterOAuth2Options} options 
  * @param {Request} req 
  * @param {Response} res 
  * @param {NextFunction} next 
@@ -72,12 +65,6 @@ async function twitterOAuth2Handler(options: TwitterOAuth2Options, req: Request,
     if (typeof redirectURI != 'string')
       throw new Error('redirect_uri must be a string');
 
-    const clientConfig: TwitterOAuth2Client = {
-      client_id: clientID,
-      client_secret: clientSecret,
-      redirect_uri: redirectURI,
-      type_of_app: options.type_of_app
-    };
     const issOpt: IssuerMetadata = {
       issuer: 'https://twitter.com',
       authorization_endpoint: 'https://twitter.com/i/oauth2/authorize',
@@ -85,10 +72,10 @@ async function twitterOAuth2Handler(options: TwitterOAuth2Options, req: Request,
     }
     const issuer: Issuer = new Issuer(issOpt);
     const client: BaseClient = new issuer.Client({
-      client_id: clientConfig.client_id,
-      client_secret: clientConfig.client_secret,
-      redirect_uris: [clientConfig.redirect_uri],
-      token_endpoint_auth_method: clientConfig.type_of_app == 'public' ? 'none' : 'client_secret_basic',
+      client_id: clientID, 
+      client_secret: clientSecret,
+      redirect_uris: [redirectURI],
+      token_endpoint_auth_method: options.type_of_app == 'public' ? 'none' : 'client_secret_basic',
     });
     if ((!req.session.isRedirected && !req.session.tokenSet)) {
       const state = generators.state();
@@ -97,11 +84,11 @@ async function twitterOAuth2Handler(options: TwitterOAuth2Options, req: Request,
       const url = authorizationRequest(client, {
         state,
         scope: options.scope,
-        codeChallenge: codeChallenge,
-        codeChallengeMethod: 'S256',
+        code_challenge: codeChallenge,
+        code_challenge_method: 'S256',
       })
       req.session.state = state;
-      req.session.codeVerifier = codeVerifier;
+      req.session.code_verifier = codeVerifier;
       req.session.originalUrl = req.originalUrl;
       req.session.isRedirected = true;
       if (req.xhr) {
@@ -112,13 +99,13 @@ async function twitterOAuth2Handler(options: TwitterOAuth2Options, req: Request,
       const state = req.session.state;
       if (typeof state != 'string')
         throw new Error('state must be a string');
-      const codeVerifier = req.session.codeVerifier;
+      const codeVerifier = req.session.code_verifier;
       if (typeof codeVerifier != 'string')
         throw new Error('client_verifier must be a string');
       const tokenSet = await tokenRequest(req, client, {
-        redirect_uri: clientConfig.redirect_uri,
-        client_id: clientConfig.client_id,
-        codeVerifier,
+        redirect_uri: redirectURI,
+        client_id: clientID,
+        code_verifier: codeVerifier,
         state: state,
       });
       req.session.tokenSet = tokenSet;
@@ -149,8 +136,8 @@ export function authorizationRequest(client: BaseClient, options: AuthorizationR
     response_type: 'code',
     scope: options.scope || 'tweet.read users.read offline.access',
     state: options.state,
-    code_challenge: options.codeChallenge,
-    code_challenge_method: options.codeChallengeMethod
+    code_challenge: options.code_challenge,
+    code_challenge_method: options.code_challenge_method
   });
   return url;
 }
@@ -165,7 +152,7 @@ export function authorizationRequest(client: BaseClient, options: AuthorizationR
  */
 export async function tokenRequest(req: Request, client: BaseClient, options: TokenRequestOptions): Promise<TokenSet> {
   const state = options.state;
-  const codeVerifier = options.codeVerifier;
+  const codeVerifier = options.code_verifier;
   const params = client.callbackParams(req);
   const tokenSet = await client.oauthCallback(options.redirect_uri, params, { code_verifier: codeVerifier, state }, { exchangeBody: { client_id: options.client_id } });
   return tokenSet;

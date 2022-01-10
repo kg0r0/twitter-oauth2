@@ -7,15 +7,9 @@ declare module 'express-session' {
         tokenSet: TokenSet;
         isRedirected: boolean;
         state: string;
-        codeVerifier: string;
+        code_verifier: string;
         originalUrl: string;
     }
-}
-export interface TwitterOAuth2Client {
-    client_id: string;
-    client_secret?: string;
-    redirect_uri: string;
-    type_of_app?: string;
 }
 export interface TwitterOAuth2Options {
     client_id?: string;
@@ -27,13 +21,13 @@ export interface TwitterOAuth2Options {
 export interface AuthorizationRequestOptions {
     state: string;
     scope?: string;
-    codeChallenge: string;
-    codeChallengeMethod: string;
+    code_challenge: string;
+    code_challenge_method: string;
 }
 export interface TokenRequestOptions {
     client_id: string;
     redirect_uri: string;
-    codeVerifier: string;
+    code_verifier: string;
     state: string;
 }
 /**

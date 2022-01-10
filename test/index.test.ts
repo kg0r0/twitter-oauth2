@@ -97,8 +97,8 @@ test('authorizationRequest returns a authorization request url.', () => {
   const client = Client({}, {});
   const url = authorizationRequest(client, {
     state: 'TEST_STATE',
-    codeChallenge: 'TEST_CODE_CHALLENGE',
-    codeChallengeMethod: 'S256'
+    code_challenge: 'TEST_CODE_CHALLENGE',
+    code_challenge_method: 'S256'
   })
   expect(url).toBe('https://localhost:5555/oauth2/authorize?client_id=TEST_CLIENT_ID&scope=tweet.read%20users.read%20offline.access&response_type=code&redirect_uri=TEST_REDIRECT_URI&state=TEST_STATE&code_challenge=TEST_CODE_CHALLENGE&code_challenge_method=S256')
 })
