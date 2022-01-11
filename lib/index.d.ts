@@ -16,7 +16,7 @@ export interface TwitterOAuth2Options {
     client_secret?: string;
     redirect_uri?: string;
     scope?: string;
-    type_of_app?: 'confidential' | 'public';
+    client_type?: 'confidential' | 'public';
 }
 export interface AuthorizationRequestOptions {
     state: string;

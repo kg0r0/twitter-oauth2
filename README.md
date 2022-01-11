@@ -80,7 +80,7 @@ Scopes allow you to set granular access for your App so that your App only has t
 See the [Twitter OAuth2.0 Guide](https://developer.twitter.com/en/docs/authentication/oauth-2-0/authorization-code) for available scopes.
 The current default is `tweet.read users.read offline.access`.
 
-##### type_of_app
+##### client_type 
 The [client type](https://datatracker.ietf.org/doc/html/rfc6749#section-2.1) defined in OAuth2.0.
 This value was set during the registration process.
 The current default is `confidential`.

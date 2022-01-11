@@ -17,7 +17,7 @@ export interface TwitterOAuth2Options {
   client_secret?: string;
   redirect_uri?: string;
   scope?: string;
-  type_of_app?: 'confidential' | 'public';
+  client_type?: 'confidential' | 'public';
 }
 
 export interface AuthorizationRequestOptions {
@@ -75,7 +75,7 @@ async function twitterOAuth2Handler(options: TwitterOAuth2Options, req: Request,
       client_id: clientID, 
       client_secret: clientSecret,
       redirect_uris: [redirectURI],
-      token_endpoint_auth_method: options.type_of_app == 'public' ? 'none' : 'client_secret_basic',
+      token_endpoint_auth_method: options.client_type == 'public' ? 'none' : 'client_secret_basic',
     });
     if ((!req.session.isRedirected && !req.session.tokenSet)) {
       const state = generators.state();
