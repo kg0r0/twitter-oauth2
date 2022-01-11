@@ -1,6 +1,6 @@
 {
   "name": "twitter-oauth2",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Express.js middleware implementation for Twitter OAuth2 Client.",
   "main": "lib/index.js",
   "scripts": {
