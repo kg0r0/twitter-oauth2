@@ -46,7 +46,6 @@ test('TwitterOAuth2 return a 500 status code when express-session is not set.', 
   app.get('/user', (req: express.Request, res: express.Response) => {
     res.status(200).json({ name: 'john' });
   });
-  // eslint-disable-next-line no-unused-vars
   const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
     res.status(err.status || 500).json({ err: { message: err.message } });
   };
