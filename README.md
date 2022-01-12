@@ -32,7 +32,12 @@ app.use(session({
   saveUninitialized: true
 }))
 
-app.use(twitterOAuth2({}))
+app.use(twitterOAuth2({
+  client_id: 'YOUR-CLIENT-ID',
+  client_secret: 'YOUR-CLIENT-SECRET',
+  redirect_uri: 'YOUR-REDIRECT-URI',
+  scope: 'tweet.read users.read offline.access'
+}))
 
 app.get('/', async (req: express.Request, res: express.Response) => {
   const tokenSet = req.session.tokenSet;
@@ -46,7 +51,7 @@ app.get('/', async (req: express.Request, res: express.Response) => {
   res.send(`Hello ${data.data.username}!`);
 })
 ```
-**Note** This module implement a session store that is compatible with [express-session](https://www.npmjs.com/package/express-session).
+**Note** This module implements a session store that is compatible with [express-session](https://www.npmjs.com/package/express-session).
 See the [example](https://github.com/kg0r0/twitter-oauth2/tree/main/example) for basic usage.
 
 ### twitterOAuth2(options)
@@ -60,18 +65,18 @@ Create a middleware with the given `options`.
 
 The client identifier.
 Can be found in the keys and tokens section of the developer portal under the header "Client ID." If you don't see this, please get in touch with our team directly. The Client ID will be needed to generate the authorize URL.
-This option can also be read from environment variable `CLIENT_ID`.
+This option can also be read from the environment variable `CLIENT_ID`.
 
 ##### client_secret
 
 The client secret.
 If you have selected an App type that is a confidential client you will be provided with a “Client Secret” under “Client ID” in your App’s keys and tokens section.
-This option can also be read from environment variable `CLIENT_SECRET`.
+This option can also be read from the environment variable `CLIENT_SECRET`.
 
 ##### redirect_uri 
 
 Your callback URL. You will need to have exact match validation.
-This option can also be read from environment variable `REDIRECT_URI`.
+This option can also be read from the environment variable `REDIRECT_URI`.
 
 ##### scope 
 
@@ -81,13 +86,13 @@ See the [Twitter OAuth2.0 Guide](https://developer.twitter.com/en/docs/authentic
 The current default is `tweet.read users.read offline.access`.
 
 ##### client_type 
-The [client type](https://datatracker.ietf.org/doc/html/rfc6749#section-2.1) defined in OAuth2.0.
+The [client type](https://datatracker.ietf.org/doc/html/rfc6749#section-2.1) is defined in OAuth2.0.
 This value was set during the registration process.
 The current default is `confidential`.
 
 #### Error Handling
 Errors raised by this middleware are handled by [the default Express error handler](https://expressjs.com/en/guide/error-handling.html#the-default-error-handler). 
-To write your own error handler, see the Express documentation on writing [Custom error handlers](https://expressjs.com/en/guide/error-handling.html#writing-error-handlers).
+To write your error handler, see the Express documentation on writing [Custom error handlers](https://expressjs.com/en/guide/error-handling.html#writing-error-handlers).
 
 ## Contributing
 Thanks for your feedback and contribution to this repo!
