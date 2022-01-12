@@ -1,8 +1,9 @@
 # Example
 
+## Authorization Code Grant
 ```bash
 $ npm install
-$ node run dev 
+$ node run authz 
 ```
 To run the example, add the following environment variables.
 ```
@@ -11,3 +12,14 @@ CLIENT_SECRET=<YOUR_CLIENT_SECRET>
 REDIRECT_URI=<YOUR_DOMAIN>
 ```
 
+## Client Credentials Grant 
+
+```bash
+$ npm install
+$ node run cc
+```
+To run the example, add the following environment variables.
+```
+CONSUMER_KEY=<YOUR_CONSUMER_KEY>
+CONSUMER_SECRET=<YOUR_CONSUMER_SECRET>
+```

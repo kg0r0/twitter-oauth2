@@ -13,10 +13,13 @@ declare module 'express-session' {
 }
 export interface TwitterOAuth2Options {
     client_id?: string;
+    consumer_key?: string;
     client_secret?: string;
+    consumer_secret?: string;
     redirect_uri?: string;
     scope?: string;
     client_type?: 'confidential' | 'public';
+    grant_type?: 'authorization_code' | 'client_credentials';
 }
 export interface AuthorizationRequestOptions {
     state: string;
