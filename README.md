@@ -6,8 +6,13 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Express.js middleware implementation for Twitter OAuth 2.0 Client.
-This module supports [OAuth2.0 Authorization Code Grant](https://datatracker.ietf.org/doc/html/rfc6749#section-4.1) with [PKCE](https://datatracker.ietf.org/doc/html/rfc7636).
-Please see the [Twitter OAuth2.0 Guide](https://developer.twitter.com/en/docs/authentication/oauth-2-0/authorization-code) for more information.
+
+This module supports the following grant type available on twitter:
+- [Authorization Code Grant](https://datatracker.ietf.org/doc/html/rfc6749#section-4.1) with [PKCE](https://datatracker.ietf.org/doc/html/rfc7636)
+- [Client Credentials Grant](https://datatracker.ietf.org/doc/html/rfc6749#section-4.4)
+
+Please see the ["OAuth 2.0 Authorization Code Flow with PKCE"](https://developer.twitter.com/en/docs/authentication/oauth-2-0/authorization-code) and ["OAuth 2.0 Bearer Token (app-only)"](https://developer.twitter.com/en/docs/authentication/oauth-2-0/application-only) for more information.
+
 
 
 ## Install
@@ -54,6 +59,33 @@ app.get('/', async (req: express.Request, res: express.Response) => {
 **Note** This module implements a session store that is compatible with [express-session](https://www.npmjs.com/package/express-session).
 See the [example](https://github.com/kg0r0/twitter-oauth2/tree/main/example) for basic usage.
 
+### Authorization Code Grant with PKCE
+
+```js
+app.use(twitterOAuth2({
+  client_id: 'YOUR-CLIENT-ID',
+  client_secret: 'YOUR-CLIENT-SECRET',
+  redirect_uri: 'YOUR-REDIRECT-URI',
+  scope: 'tweet.read users.read offline.access'
+}))
+```
+
+### Client Credentials Grant 
+
+```js
+app.use(twitterOAuth2({
+  consumer_key: 'YOUR-CONSUMER-KEY',
+  consumer_secret: 'YOUR-CONSUMER-SECRET',
+  grant_type: 'client_credentials'
+}))
+```
+
+## API
+
+```js
+import { twitterOAuth2 } from 'twitter-oauth2';
+```
+
 ### twitterOAuth2(options)
 
 Create a middleware with the given `options`.
@@ -89,6 +121,22 @@ The current default is `tweet.read users.read offline.access`.
 The [client type](https://datatracker.ietf.org/doc/html/rfc6749#section-2.1) is defined in OAuth2.0.
 This value was set during the registration process.
 The current default is `confidential`.
+
+##### grant_type
+The [grant_type](https://datatracker.ietf.org/doc/html/rfc6749#appendix-A.10) is defined in OAuth2.0.
+The current default is `authorization_code`.
+
+##### consumer_key
+
+The client identifier.
+In Client Credentials Grant, the consumer key is used as the client_id.
+This option can also be read from the environment variable `CONSUMER_KEY`.
+
+##### consumer_secret
+
+The client secret.
+In Client Credentials Grant, the consumer secret is used as the client_secret.
+This option can also be read from the environment variable `CONSUMER_SECRET`.
 
 #### Error Handling
 Errors raised by this middleware are handled by [the default Express error handler](https://expressjs.com/en/guide/error-handling.html#the-default-error-handler). 
