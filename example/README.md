@@ -3,7 +3,7 @@
 ## Authorization Code Grant
 ```bash
 $ npm install
-$ node run start:authz 
+$ npm run start:authz 
 ```
 To run the example, add the following environment variables.
 ```
@@ -16,7 +16,7 @@ REDIRECT_URI=<YOUR_DOMAIN>
 
 ```bash
 $ npm install
-$ node run start:cc
+$ npm run start:cc
 ```
 To run the example, add the following environment variables.
 ```
