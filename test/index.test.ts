@@ -1,9 +1,30 @@
-import { twitterOAuth2, TwitterOAuth2Options, authorizationRequest } from '../src'
+import { twitterOAuth2, TwitterOAuth2Options, authorizationRequest, tokenRequest } from '../src'
 import { Issuer, BaseClient } from 'openid-client';
 import express from 'express';
 import session from 'express-session';
 import request from 'supertest';
 import { ErrorRequestHandler } from 'express-serve-static-core';
+import nock from 'nock';
+
+beforeEach(() => {
+  nock('https://api.twitter.com')
+    .post('/2/oauth2/token')
+    .basicAuth({ user: 'TEST_CLIENT_ID', pass: 'TEST_CLIENT_SECRET' })
+    .reply(200, {
+      token_type: 'bearer',
+      expires_at: 1095379198,
+      access_token: 'TEST_ACCESS_TOKEN',
+      scope: 'TEST_SCOPE',
+      refresh_token: 'TEST_REFRESH_TOKEN'
+    })
+  nock('https://api.twitter.com')
+    .post('/oauth2/token')
+    .basicAuth({ user: 'TEST_CONSUMER_KEY', pass: 'TEST_CONSUMER_SECRET' })
+    .reply(200, {
+      token_type: 'bearer',
+      access_token: 'TEST_ACCESS_TOKEN'
+    })
+})
 
 interface IssuerOptions {
   issuer?: string
@@ -17,89 +38,160 @@ interface ClientOptions {
   redirect_uri?: string
 }
 
-test('TwitterOAuth2 redirects the resource owner to twitter.', done => {
-  const app = App();
-  request(app)
-    .get('/')
-    .expect('Location', /^https:\/\/twitter.com\/i\/oauth2\/authorize.*/)
-    .expect(
-      302, done
-    )
-})
+const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+  res.status(err.status || 500).json({ err: { message: err.message } });
+};
 
-test('TwitterOAuth2 return a 403 status code when an asynchronous request is sent.', done => {
-  const app = App();
-  request(app)
-    .get('/')
-    .set('X-Requested-With', 'XMLHttpRequest')
-    .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(403, done)
-})
-
-test('TwitterOAuth2 return a 500 status code when express-session is not set.', done => {
-  const app: express.Express = express();
-  app.use(twitterOAuth2({
-    client_id: 'TEST_CLIENT_ID',
-    client_secret: 'TEST_CLIENT_SECRET',
-    redirect_uri: 'TEST_REDIRECT_URI'
-  }))
-  app.get('/user', (req: express.Request, res: express.Response) => {
-    res.status(200).json({ name: 'john' });
-  });
-  const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
-    res.status(err.status || 500).json({ err: { message: err.message } });
-  };
-  app.use(errorHandler);
-  request(app)
-    .get('/user')
-    .expect(500)
-    .then(res => {
-      expect(res.text).toBe('{"err":{"message":"express-session is not configured"}}');
-      done();
-    })
-    .catch(err => done(err))
-})
-
-test('TwitterOAuth2 return a 500 status code when client_id is not set.', done => {
-  const app: express.Express = express();
-  app.use(session({
-    name: 'TEST',
-    secret: 'TEST-SECRET',
-    cookie: {
-      sameSite: 'lax'
-    },
-    resave: false,
-    saveUninitialized: true
-  }))
-  app.use(twitterOAuth2({
-    client_secret: 'TEST_CLIENT_SECRET',
-    redirect_uri: 'TEST_REDIRECT_URI'
-  }))
-  app.get('/user', (req: express.Request, res: express.Response) => {
-    res.status(200).json({ name: 'john' });
-  });
-  const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
-    res.status(err.status || 500).json({ err: { message: err.message } });
-  };
-  app.use(errorHandler);
-  request(app)
-    .get('/user')
-    .expect(500)
-    .then(res => {
-      expect(res.text).toBe('{"err":{"message":"client_id must be a string"}}');
-      done();
-    })
-    .catch(err => done(err))
-})
-
-test('authorizationRequest returns a authorization request url.', () => {
-  const client = Client({}, {});
-  const url = authorizationRequest(client, {
-    state: 'TEST_STATE',
-    code_challenge: 'TEST_CODE_CHALLENGE',
-    code_challenge_method: 'S256'
+describe('TwitterOAuth2', () => {
+  it('redirects the resource owner to twitter.', done => {
+    const app = App();
+    request(app)
+      .get('/')
+      .expect('Location', /^https:\/\/twitter.com\/i\/oauth2\/authorize.*/)
+      .expect(
+        302, done
+      )
   })
-  expect(url).toBe('https://localhost:5555/oauth2/authorize?client_id=TEST_CLIENT_ID&scope=tweet.read%20users.read%20offline.access&response_type=code&redirect_uri=TEST_REDIRECT_URI&state=TEST_STATE&code_challenge=TEST_CODE_CHALLENGE&code_challenge_method=S256')
+
+  it('returns a 403 status code when an asynchronous request is sent.', done => {
+    const app = App();
+    request(app)
+      .get('/')
+      .set('X-Requested-With', 'XMLHttpRequest')
+      .expect('Content-Type', 'application/json; charset=utf-8')
+      .expect(403, done)
+  })
+
+  it('returns a 500 status code when express-session is not set.', done => {
+    const app: express.Express = express();
+    app.use(twitterOAuth2({
+      client_id: 'TEST_CLIENT_ID',
+      client_secret: 'TEST_CLIENT_SECRET',
+      redirect_uri: 'TEST_REDIRECT_URI'
+    }))
+    app.get('/user', (req: express.Request, res: express.Response) => {
+      res.status(200).json({ name: 'john' });
+    });
+    app.use(errorHandler);
+    request(app)
+      .get('/user')
+      .expect(500)
+      .then(res => {
+        expect(res.text).toBe('{"err":{"message":"express-session is not configured"}}');
+        done();
+      })
+      .catch(err => done(err))
+  })
+
+  it('return a 500 status code when client_id is not set.', done => {
+    const app: express.Express = express();
+    app.use(session({
+      name: 'TEST',
+      secret: 'TEST-SECRET',
+      cookie: {
+        sameSite: 'lax'
+      },
+      resave: false,
+      saveUninitialized: true
+    }))
+    app.use(twitterOAuth2({
+      client_secret: 'TEST_CLIENT_SECRET',
+      redirect_uri: 'TEST_REDIRECT_URI'
+    }))
+    app.get('/user', (req: express.Request, res: express.Response) => {
+      res.status(200).json({ name: 'john' });
+    });
+    app.use(errorHandler);
+    request(app)
+      .get('/user')
+      .expect(500)
+      .then(res => {
+        expect(res.text).toBe('{"err":{"message":"client_id must be a string"}}');
+        done();
+      })
+      .catch(err => done(err))
+  })
+
+  it('returns a 200 status code (Client Credentials Grant).', done => {
+    const app = App({
+      consumer_key: 'TEST_CONSUMER_KEY',
+      consumer_secret: 'TEST_CONSUMER_SECRET',
+      grant_type: 'client_credentials'
+    });
+    app.get('/', (req: express.Request, res: express.Response) => {
+      res.status(200).json({ status: req.session.tokenSet });
+    });
+    request(app)
+      .get('/')
+      .expect(
+        200, done
+      )
+  })
+
+  it('returns a 500 status code when express-session is not set (Client Credentials Grant).', done => {
+    const app: express.Express = express();
+    app.use(twitterOAuth2({
+      consumer_key: 'TEST_CONSUMER_KEY',
+      consumer_secret: 'TEST_CONSUMER_SECRET',
+      grant_type: 'client_credentials'
+    }))
+    app.get('/user', (req: express.Request, res: express.Response) => {
+      res.status(200).json({ name: 'john' });
+    });
+    app.use(errorHandler);
+    request(app)
+      .get('/user')
+      .expect(500)
+      .then(res => {
+        expect(res.text).toBe('{"err":{"message":"express-session is not configured"}}');
+        done();
+      })
+      .catch(err => done(err))
+  })
+
+
+})
+
+describe('authorizationRequest', () => {
+  it('returns a authorization request url.', () => {
+    const client = Client({}, {});
+    const url = authorizationRequest(client, {
+      state: 'TEST_STATE',
+      code_challenge: 'TEST_CODE_CHALLENGE',
+      code_challenge_method: 'S256'
+    })
+    expect(url).toBe('https://localhost:5555/oauth2/authorize?client_id=TEST_CLIENT_ID&scope=tweet.read%20users.read%20offline.access&response_type=code&redirect_uri=TEST_REDIRECT_URI&state=TEST_STATE&code_challenge=TEST_CODE_CHALLENGE&code_challenge_method=S256')
+  })
+})
+
+describe('tokenRequest', () => {
+  it('returns the tokenSet', async () => {
+    const issuer: Issuer = new Issuer({
+      issuer: 'https://twitter.com',
+      authorization_endpoint: 'https://twitter.com/i/oauth2/authorize',
+      token_endpoint: 'https://api.twitter.com/2/oauth2/token'
+    })
+    const client: BaseClient = new issuer.Client({
+      client_id: 'TEST_CLIENT_ID',
+      client_secret: 'TEST_CLIENT_SECRET',
+      redirect_uris: ['TEST_REDIRECT_URI'],
+    });
+    const mockRequest = {
+      method: 'GET',
+      url: 'http://localhost/cb?code=TEST_CODE&state=TEST_STATE',
+    } as unknown as express.Request;
+    const tokenSet = await tokenRequest(mockRequest, client, {
+      client_id: 'TEST_CLIENT_ID',
+      state: 'TEST_STATE',
+      code_verifier: 'TEST_CODE_VERIFIER',
+      redirect_uri: 'TEST_REDIRECT_URI'
+    })
+    expect(tokenSet.token_type).toBe('bearer')
+    expect(tokenSet.expires_at).toBe(1095379198)
+    expect(tokenSet.access_token).toBe('TEST_ACCESS_TOKEN')
+    expect(tokenSet.scope).toBe('TEST_SCOPE')
+    expect(tokenSet.refresh_token).toBe('TEST_REFRESH_TOKEN')
+  })
 })
 
 function App(twitterOAuth2Options?: TwitterOAuth2Options, sessionOptions?: session.SessionOptions) {
@@ -115,8 +207,10 @@ function App(twitterOAuth2Options?: TwitterOAuth2Options, sessionOptions?: sessi
   }))
   app.use(twitterOAuth2(twitterOAuth2Options || {
     client_id: 'TEST_CLIENT_ID',
+    consumer_key: 'TEST_CONSUMER_KEY',
     client_secret: 'TEST_CLIENT_SECRET',
-    redirect_uri: 'TEST_REDIRECT_URI'
+    consumer_secret: 'TEST_CONSUMER_SECRET',
+    redirect_uri: 'TEST_REDIRECT_URI',
   }));
   return app
 }
