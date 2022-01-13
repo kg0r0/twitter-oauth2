@@ -1,8 +1,9 @@
 # :baby_chick: twitter-oauth2
 [![Npm package version](https://badgen.net/npm/v/twitter-oauth2)](https://badge.fury.io/js/twitter-oauth2)
-[![Build](https://github.com/kg0r0/twitter-oauth2/actions/workflows/main.yml/badge.svg)](https://github.com/kg0r0/twitter-oauth2/actions/workflows/main.yml)
+[![CI](https://github.com/kg0r0/twitter-oauth2/actions/workflows/ci.yml/badge.svg)](https://github.com/kg0r0/twitter-oauth2/actions/workflows/ci.yml)
 [![Publish](https://github.com/kg0r0/twitter-oauth2/actions/workflows/npm.yml/badge.svg)](https://github.com/kg0r0/twitter-oauth2/actions/workflows/npm.yml)
 [![CodeQL](https://github.com/kg0r0/twitter-oauth2/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/kg0r0/twitter-oauth2/actions/workflows/codeql-analysis.yml)
+[![Coverage Status](https://coveralls.io/repos/github/kg0r0/twitter-oauth2/badge.svg?branch=main)](https://coveralls.io/github/kg0r0/twitter-oauth2?branch=main)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Express.js middleware implementation for Twitter OAuth 2.0 Client.
