@@ -192,6 +192,62 @@ describe('TwitterOAuth2', () => {
       .catch(err => done(err))
   })
 
+  it('returns a 500 status code when consumer_key is not set (Client Credentials Grant).', done => {
+    const app: express.Express = express();
+    app.use(session({
+      name: 'TEST',
+      secret: 'TEST-SECRET',
+      cookie: {
+        sameSite: 'lax'
+      },
+      resave: false,
+      saveUninitialized: true
+    }))
+    app.use(twitterOAuth2({
+      grant_type: 'client_credentials'
+    }))
+    app.get('/user', (req: express.Request, res: express.Response) => {
+      res.status(200).json({ name: 'john' });
+    });
+    app.use(errorHandler);
+    request(app)
+      .get('/user')
+      .expect(500)
+      .then(res => {
+        expect(res.text).toBe('{"err":{"message":"consumer_key must be a string"}}');
+        done();
+      })
+      .catch(err => done(err))
+  })
+
+  it('returns a 500 status code when consumer_secret is not set (Client Credentials Grant).', done => {
+    const app: express.Express = express();
+    app.use(session({
+      name: 'TEST',
+      secret: 'TEST-SECRET',
+      cookie: {
+        sameSite: 'lax'
+      },
+      resave: false,
+      saveUninitialized: true
+    }))
+    app.use(twitterOAuth2({
+      consumer_key: 'TEST_CONSUMER_KEY',
+      grant_type: 'client_credentials'
+    }))
+    app.get('/user', (req: express.Request, res: express.Response) => {
+      res.status(200).json({ name: 'john' });
+    });
+    app.use(errorHandler);
+    request(app)
+      .get('/user')
+      .expect(500)
+      .then(res => {
+        expect(res.text).toBe('{"err":{"message":"consumer_secret must be a string"}}');
+        done();
+      })
+      .catch(err => done(err))
+  })
 
 })
 
