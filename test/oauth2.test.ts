@@ -1,4 +1,4 @@
-import { authorizationRequest, clientCredentialsGrant, tokenRequest } from '../src/oauth2'
+import { authorizationCodeGrant, authorizationRequest, clientCredentialsGrant, tokenRequest } from '../src/oauth2'
 import { Issuer, BaseClient } from 'openid-client';
 import express from 'express';
 import nock from 'nock';
@@ -35,7 +35,31 @@ interface ClientOptions {
   redirect_uri?: string
 }
 
-describe('clientCredentialsCodeGrant', () => {
+describe('authorizationCodeGrant', () => {
+  it('should not do anything if req.session.tokenSet is already set', async () => {
+    const mockRequest = {
+      session: {
+        tokenSet: {
+          token_type: 'bearer',
+          access_token: 'TEST-ACCESS-TOKEN'
+        },
+        isRedirected: true
+      }
+    } as unknown as express.Request;
+    const mockResponse = {
+    } as unknown as express.Response
+    await authorizationCodeGrant({
+      client_id: 'TEST_CLIENT_ID',
+      client_secret: 'TEST_CLIENT_SECRET',
+      redirect_uri: 'TEST_REDIRECT_URI'
+    }, mockRequest, mockResponse, () => {
+      // do nothing.
+    })
+    expect(mockRequest.session.tokenSet).toEqual({ token_type: 'bearer', access_token: 'TEST-ACCESS-TOKEN' })
+  })
+})
+
+describe('clientCredentialsGrant', () => {
   it('should not do anything if req.session.tokenSet is already set', async () => {
     const mockRequest = {
       session: {
