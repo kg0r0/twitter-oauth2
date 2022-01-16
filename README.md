@@ -62,10 +62,23 @@ See the [example](https://github.com/kg0r0/twitter-oauth2/tree/main/example) for
 
 ### Authorization Code Grant with PKCE
 
+#### Confidential Client
+
 ```js
 app.use(twitterOAuth2({
   client_id: 'YOUR-CLIENT-ID',
   client_secret: 'YOUR-CLIENT-SECRET',
+  redirect_uri: 'YOUR-REDIRECT-URI',
+  scope: 'tweet.read users.read offline.access'
+}))
+```
+
+#### Public Client
+
+```js
+app.use(twitterOAuth2({
+  client_type: 'public',
+  client_id: 'YOUR-CLIENT-ID',
   redirect_uri: 'YOUR-REDIRECT-URI',
   scope: 'tweet.read users.read offline.access'
 }))
