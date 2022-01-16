@@ -1,4 +1,4 @@
-import { authorizationCodeGrant, authorizationRequest, clientCredentialsGrant, tokenRequest } from '../src/oauth2'
+import { authorizationRequest, clientCredentialsGrant, tokenRequest } from '../src/oauth2'
 import { Issuer, BaseClient } from 'openid-client';
 import express from 'express';
 import nock from 'nock';
@@ -47,7 +47,9 @@ describe('clientCredentialsCodeGrant', () => {
     } as unknown as express.Request;
     const mockResponse = {
     } as unknown as express.Response
-    await clientCredentialsGrant({}, mockRequest, mockResponse, () => { })
+    await clientCredentialsGrant({}, mockRequest, mockResponse, () => {
+      // do nothing.
+    })
     expect(mockRequest.session.tokenSet).toEqual({ token_type: 'bearer', access_token: 'TEST-ACCESS-TOKEN' })
   })
 })
