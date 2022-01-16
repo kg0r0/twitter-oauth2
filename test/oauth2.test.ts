@@ -58,7 +58,7 @@ describe('authorizationCodeGrant', () => {
     expect(mockRequest.session.tokenSet).toEqual({ token_type: 'bearer', access_token: 'TEST_ACCESS_TOKEN' })
   })
 
-  it('should not do anything if req.session.tokenSet is already set', async () => {
+  it('should set tokenSet', async () => {
     const mockRequest = {
       method: 'GET',
       url: 'http://localhost/cb?code=TEST_CODE&state=TEST_STATE',
