@@ -33,7 +33,7 @@ export interface TokenRequestOptions {
     state: string;
 }
 /**
- * Returns a middleware that checks whether an resource owner is authorized.
+ * Returns a middleware for Authorization Code Grant.
  *
  * @param {TwitterOAuth2Options} options
  * @param {Request} req
@@ -42,6 +42,15 @@ export interface TokenRequestOptions {
  * @returns
  */
 export declare function authorizationCodeGrant(options: TwitterOAuth2Options, req: Request, res: Response, next: NextFunction): Promise<void | Response<any, Record<string, any>>>;
+/**
+ * Returns a middleware for Client Credentials Grant.
+ *
+ * @param {TwitterOAuth2Options} options
+ * @param {Request} req
+ * @param {Response} res
+ * @param {NextFunction} next
+ * @returns
+ */
 export declare function clientCredentialsGrant(options: TwitterOAuth2Options, req: Request, res: Response, next: NextFunction): Promise<void>;
 /**
  * Returns a Authorization Request URL.

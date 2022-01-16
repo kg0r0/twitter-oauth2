@@ -38,7 +38,7 @@ export interface TokenRequestOptions {
 }
 
 /**
- * Returns a middleware that checks whether an resource owner is authorized.
+ * Returns a middleware for Authorization Code Grant.
  *  
  * @param {TwitterOAuth2Options} options 
  * @param {Request} req 
@@ -117,6 +117,15 @@ export async function authorizationCodeGrant(options: TwitterOAuth2Options, req:
   return
 }
 
+/**
+ * Returns a middleware for Client Credentials Grant.
+ * 
+ * @param {TwitterOAuth2Options} options 
+ * @param {Request} req 
+ * @param {Response} res 
+ * @param {NextFunction} next 
+ * @returns 
+ */
 export async function clientCredentialsGrant(options: TwitterOAuth2Options, req: Request, res: Response, next: NextFunction) {
   try {
     if (!req.session)
