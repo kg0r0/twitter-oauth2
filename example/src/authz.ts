@@ -22,7 +22,7 @@ app.use(session({
   saveUninitialized: true
 }))
 
-app.use(twitterOAuth2({}))
+app.use(twitterOAuth2())
 
 app.use(errorHandler);
 

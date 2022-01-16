@@ -6,7 +6,7 @@ import { TwitterOAuth2Options, authorizationCodeGrant, clientCredentialsGrant} f
  * @param {TwitterOAuth2Options} options
  * @returns {function} middleware
  */
-export const twitterOAuth2 = function (options: TwitterOAuth2Options) {
+export const twitterOAuth2 = function (options: TwitterOAuth2Options = {}) {
   if (options.grant_type == 'client_credentials') {
     return clientCredentialsGrant.bind(undefined, options);
   }
