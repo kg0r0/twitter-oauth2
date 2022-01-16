@@ -14,9 +14,6 @@ This module supports the following grant type available on twitter:
 
 Please see the ["OAuth 2.0 Authorization Code Flow with PKCE"](https://developer.twitter.com/en/docs/authentication/oauth-2-0/authorization-code) and ["OAuth 2.0 Bearer Token (app-only)"](https://developer.twitter.com/en/docs/authentication/oauth-2-0/application-only) for more information.
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
 - [Install](#install)
 - [Usage](#usage)
   - [Authorization Code Grant with PKCE](#authorization-code-grant-with-pkce)
@@ -26,19 +23,9 @@ Please see the ["OAuth 2.0 Authorization Code Flow with PKCE"](https://developer
 - [API](#api)
   - [twitterOAuth2(options)](#twitteroauth2options)
     - [Options](#options)
-      - [client_id](#client_id)
-      - [client_secret](#client_secret)
-      - [redirect_uri](#redirect_uri)
-      - [scope](#scope)
-      - [client_type](#client_type)
-      - [grant_type](#grant_type)
-      - [consumer_key](#consumer_key)
-      - [consumer_secret](#consumer_secret)
     - [Error Handling](#error-handling)
 - [Contributing](#contributing)
 - [License](#license)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Install
 ```bash
