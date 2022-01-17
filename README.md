@@ -14,6 +14,7 @@ This module supports the following grant type available on twitter:
 
 Please see the ["OAuth 2.0 Authorization Code Flow with PKCE"](https://developer.twitter.com/en/docs/authentication/oauth-2-0/authorization-code) and ["OAuth 2.0 Bearer Token (app-only)"](https://developer.twitter.com/en/docs/authentication/oauth-2-0/application-only) for more information.
 
+**Table of Contents**
 - [Install](#install)
 - [Usage](#usage)
   - [Authorization Code Grant with PKCE](#authorization-code-grant-with-pkce)
