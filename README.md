@@ -10,7 +10,7 @@ Express.js middleware implementation for Twitter OAuth 2.0 Client.
 
 This module supports the following grant type available on twitter:
 - [Authorization Code Grant with PKCE](https://developer.twitter.com/en/docs/authentication/oauth-2-0/authorization-code)
-- [Client Credentials Grant](https://developer.twitter.com/en/docs/authentication/oauth-2-0/application-only))
+- [Client Credentials Grant](https://developer.twitter.com/en/docs/authentication/oauth-2-0/application-only)
 
 **Table of Contents**
 - [Install](#install)
