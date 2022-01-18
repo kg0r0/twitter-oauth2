@@ -141,7 +141,7 @@ This option can also be read from the environment variable `REDIRECT_URI`.
 ##### scope 
 
 The scope of the access request.
-Please see the [documentation](https://developer.twitter.com/en/docs/authentication/oauth-2-0/authorization-code)) for available scopes.
+Please see the [documentation](https://developer.twitter.com/en/docs/authentication/oauth-2-0/authorization-code) for available scopes.
 The current default is `tweet.read users.read offline.access`.
 
 ##### client_type 
