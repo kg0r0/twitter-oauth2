@@ -1,4 +1,4 @@
-# :baby_chick: twitter-oauth2
+# twitter-oauth2
 [![Npm package version](https://badgen.net/npm/v/twitter-oauth2)](https://badge.fury.io/js/twitter-oauth2)
 [![CI](https://github.com/kg0r0/twitter-oauth2/actions/workflows/ci.yml/badge.svg)](https://github.com/kg0r0/twitter-oauth2/actions/workflows/ci.yml)
 [![Publish](https://github.com/kg0r0/twitter-oauth2/actions/workflows/npm.yml/badge.svg)](https://github.com/kg0r0/twitter-oauth2/actions/workflows/npm.yml)
@@ -9,10 +9,8 @@
 Express.js middleware implementation for Twitter OAuth 2.0 Client.
 
 This module supports the following grant type available on twitter:
-- [Authorization Code Grant](https://datatracker.ietf.org/doc/html/rfc6749#section-4.1) with [PKCE](https://datatracker.ietf.org/doc/html/rfc7636)
-- [Client Credentials Grant](https://datatracker.ietf.org/doc/html/rfc6749#section-4.4)
-
-Please see the ["OAuth 2.0 Authorization Code Flow with PKCE"](https://developer.twitter.com/en/docs/authentication/oauth-2-0/authorization-code) and ["OAuth 2.0 Bearer Token (app-only)"](https://developer.twitter.com/en/docs/authentication/oauth-2-0/application-only) for more information.
+- [Authorization Code Grant with PKCE](https://developer.twitter.com/en/docs/authentication/oauth-2-0/authorization-code)
+- [Client Credentials Grant](https://developer.twitter.com/en/docs/authentication/oauth-2-0/application-only))
 
 **Table of Contents**
 - [Install](#install)
@@ -38,14 +36,13 @@ $ npm i twitter-oauth2
 import express from 'express';
 import session from 'express-session';
 import { twitterOAuth2 } from 'twitter-oauth2';
+
 const app: express.Express = express();
 
+/* ---- express-session ----*/
 app.use(session({
   name: 'YOUR-SESSION-NAME',
   secret: 'YOUR-SECRET',
-  cookie: {
-    sameSite: 'lax'
-  },
   resave: false,
   saveUninitialized: true
 }))
@@ -69,10 +66,13 @@ app.get('/', async (req: express.Request, res: express.Response) => {
   res.send(`Hello ${data.data.username}!`);
 })
 ```
-**Note** This module implements a session store that is compatible with [express-session](https://www.npmjs.com/package/express-session).
-See the [example](https://github.com/kg0r0/twitter-oauth2/tree/main/example) for basic usage.
+**Note** This module uses a session store that is compatible with [express-session](https://www.npmjs.com/package/express-session).
+
+See the [example](https://github.com/kg0r0/twitter-oauth2/tree/main/example) for more details.
 
 ### Authorization Code Grant with PKCE
+
+The required arguments depend on the client type.
 
 #### Confidential Client
 
@@ -121,26 +121,27 @@ Create a middleware with the given `options`.
 
 ##### client_id
 
-The client identifier.
-Can be found in the keys and tokens section of the developer portal under the header "Client ID." If you don't see this, please get in touch with our team directly. The Client ID will be needed to generate the authorize URL.
+The identifier of the Client.
+You can check it from the Developer Portal.
+This option is used in case Authorization Code Grant.
 This option can also be read from the environment variable `CLIENT_ID`.
 
 ##### client_secret
 
-The client secret.
-If you have selected an App type that is a confidential client you will be provided with a “Client Secret” under “Client ID” in your App’s keys and tokens section.
+This is the secret information used for client authentication.
+You can check it from the Developer Portal.
+This option is used in the case of Authorization Code Grant and Confidential Client.
 This option can also be read from the environment variable `CLIENT_SECRET`.
 
 ##### redirect_uri 
 
-Your callback URL. You will need to have exact match validation.
+This is the callback URL that you registered on the Developer Portal.
 This option can also be read from the environment variable `REDIRECT_URI`.
 
 ##### scope 
 
 The scope of the access request.
-Scopes allow you to set granular access for your App so that your App only has the permissions that it needs. 
-See the [Twitter OAuth2.0 Guide](https://developer.twitter.com/en/docs/authentication/oauth-2-0/authorization-code) for available scopes.
+Please see the [documentation](https://developer.twitter.com/en/docs/authentication/oauth-2-0/authorization-code)) for available scopes.
 The current default is `tweet.read users.read offline.access`.
 
 ##### client_type 
