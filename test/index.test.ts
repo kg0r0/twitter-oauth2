@@ -41,6 +41,35 @@ describe('TwitterOAuth2', () => {
       )
   })
 
+  it('redirects the resource owner to twitter when client_type is public.', done => {
+    const app = App({
+      client_id: 'TEST_CLIENT_ID',
+      redirect_uri: 'TEST_REDIRECT_URI',
+      client_type: 'public'
+    });
+    request(app)
+      .get('/')
+      .expect('Location', /^https:\/\/twitter.com\/i\/oauth2\/authorize.*/)
+      .expect(
+        302, done
+      )
+  })
+
+  it('works normaly with no arguments.', () => {
+    const app: express.Express = express()
+    app.use(session({
+      name: 'TEST',
+      secret: 'TEST-SECRET',
+      resave: false,
+      saveUninitialized: true
+    }))
+    try {
+      app.use(twitterOAuth2());
+    } catch (err) {
+      expect(err).toBeUndefined();
+    }
+  })
+
   it('returns a 500 status code when client_id is not set.', done => {
     const app: express.Express = express();
     app.use(session({
