@@ -78,12 +78,68 @@ describe('authorizationCodeGrant', () => {
     }, mockRequest, mockResponse, () => {
       // do nothing.
     })
-    expect(mockRequest.session.tokenSet).toEqual({ 
+    expect(mockRequest.session.tokenSet).toEqual({
       token_type: 'bearer',
       expires_at: 1095379198,
       access_token: 'TEST_ACCESS_TOKEN',
       scope: 'TEST_SCOPE',
       refresh_token: 'TEST_REFRESH_TOKEN'
+    })
+  })
+
+  it('returns error when state is not set.', async () => {
+    const mockRequest = {
+      session: {
+        isRedirected: true
+      }
+    } as unknown as express.Request;
+    const mockResponse = {
+    } as unknown as express.Response
+    await authorizationCodeGrant({
+      client_id: 'TEST_CLIENT_ID',
+      client_secret: 'TEST_CLIENT_SECRET',
+      redirect_uri: 'TEST_REDIRECT_URI'
+    }, mockRequest, mockResponse, (err) => {
+      expect(err.message).toBe('state must be a string');
+    })
+  })
+
+  it('returns error when code_verifier is not set.', async () => {
+    const mockRequest = {
+      session: {
+        isRedirected: true,
+        state: 'TEST_STATE'
+      }
+    } as unknown as express.Request;
+    const mockResponse = {
+    } as unknown as express.Response
+    await authorizationCodeGrant({
+      client_id: 'TEST_CLIENT_ID',
+      client_secret: 'TEST_CLIENT_SECRET',
+      redirect_uri: 'TEST_REDIRECT_URI'
+    }, mockRequest, mockResponse, (err) => {
+      expect(err.message).toBe('code_verifier must be a string');
+    })
+  })
+
+  it('returns error when originalUrl is not set.', async () => {
+    const mockRequest = {
+      method: 'GET',
+      url: 'http://localhost/cb?code=TEST_CODE&state=TEST_STATE',
+      session: {
+        isRedirected: true,
+        state: 'TEST_STATE',
+        code_verifier: 'TEST_CODE_VERIFIER'
+      }
+    } as unknown as express.Request;
+    const mockResponse = {
+    } as unknown as express.Response
+    await authorizationCodeGrant({
+      client_id: 'TEST_CLIENT_ID',
+      client_secret: 'TEST_CLIENT_SECRET',
+      redirect_uri: 'TEST_REDIRECT_URI'
+    }, mockRequest, mockResponse, (err) => {
+      expect(err.message).toBe('originalUrl must be a string');
     })
   })
 })

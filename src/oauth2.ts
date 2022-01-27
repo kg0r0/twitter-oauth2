@@ -94,7 +94,7 @@ export async function authorizationCodeGrant(options: TwitterOAuth2Options, req:
         throw new Error('state must be a string');
       const codeVerifier = req.session.code_verifier;
       if (typeof codeVerifier != 'string')
-        throw new Error('client_verifier must be a string');
+        throw new Error('code_verifier must be a string');
       const tokenSet = await tokenRequest(req, client, {
         redirect_uri: redirectURI,
         client_id: clientID,
