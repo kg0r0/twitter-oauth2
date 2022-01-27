@@ -3,6 +3,10 @@ import { Issuer, BaseClient } from 'openid-client';
 import express from 'express';
 import nock from 'nock';
 
+interface MockResponse extends express.Response {
+  json: jest.Mock;
+}
+
 beforeEach(() => {
   nock('https://api.twitter.com')
     .post('/2/oauth2/token')
@@ -85,6 +89,32 @@ describe('authorizationCodeGrant', () => {
       scope: 'TEST_SCOPE',
       refresh_token: 'TEST_REFRESH_TOKEN'
     })
+  })
+
+  it('returns a 200 status code when an asynchronous request is sent.', async () => {
+    const mockRequest = {
+      method: 'GET',
+      xhr: true,
+      url: 'http://localhost/cb?code=TEST_CODE&state=TEST_STATE',
+      Headers: [],
+      session: {
+        state: 'TEST_STATE',
+        code_verifier: 'TEST_CODE_VERIFIER',
+        originalUrl: '/',
+        isRedirected: true
+      }
+    } as unknown as express.Request;
+    const mockResponse = {
+      json: jest.fn().mockReturnThis()
+    } as MockResponse
+    await authorizationCodeGrant({
+      client_id: 'TEST_CLIENT_ID',
+      client_secret: 'TEST_CLIENT_SECRET',
+      redirect_uri: 'TEST_REDIRECT_URI'
+    }, mockRequest, mockResponse, () => {
+      // do nothing.
+    })
+    expect(mockResponse.json.mock.calls[0][0]).toEqual({'location': '/'})
   })
 
   it('returns error when state is not set.', async () => {
