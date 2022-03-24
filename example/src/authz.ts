@@ -1,6 +1,6 @@
 import express, { ErrorRequestHandler } from 'express';
 import session from 'express-session';
-import { twitterOAuth2 } from '../../lib/';
+import { twitterOAuth2 } from 'twitter-oauth2';
 import crypto from 'crypto';
 import { request } from 'undici';
 

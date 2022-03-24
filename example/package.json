@@ -17,7 +17,7 @@
     "crypto": "^1.0.1",
     "express": "^4.17.2",
     "express-session": "^1.17.2",
-    "twitter-oauth2": "^1.0.4",
+    "twitter-oauth2": "latest",
     "undici": "^4.14.1"
   },
   "devDependencies": {
