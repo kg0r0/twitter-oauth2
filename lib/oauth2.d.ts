@@ -69,3 +69,11 @@ export declare function authorizationRequest(client: BaseClient, options: Author
  * @returns {Promise<TokenSet>}
  */
 export declare function tokenRequest(req: Request, client: BaseClient, options: TokenRequestOptions): Promise<TokenSet>;
+/**
+ * Refreshing an Access Token.
+ *
+ * @param {Request} req
+ * @param {BaseClient} client
+ * @returns {Promise<TokenSet>}
+ */
+export declare function refreshTokenGrant(req: Request, client: BaseClient): Promise<TokenSet>;

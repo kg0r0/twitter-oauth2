@@ -1,4 +1,4 @@
-import { authorizationCodeGrant, authorizationRequest, clientCredentialsGrant, tokenRequest } from '../src/oauth2'
+import { authorizationCodeGrant, authorizationRequest, clientCredentialsGrant, tokenRequest, refreshTokenGrant } from '../src/oauth2'
 import { Issuer, BaseClient } from 'openid-client';
 import express from 'express';
 import nock from 'nock';
@@ -114,7 +114,7 @@ describe('authorizationCodeGrant', () => {
     }, mockRequest, mockResponse, () => {
       // do nothing.
     })
-    expect(mockResponse.json.mock.calls[0][0]).toEqual({'location': '/'})
+    expect(mockResponse.json.mock.calls[0][0]).toEqual({ 'location': '/' })
   })
 
   it('returns error when state is not set.', async () => {
@@ -232,6 +232,84 @@ describe('tokenRequest', () => {
     expect(tokenSet.access_token).toBe('TEST_ACCESS_TOKEN')
     expect(tokenSet.scope).toBe('TEST_SCOPE')
     expect(tokenSet.refresh_token).toBe('TEST_REFRESH_TOKEN')
+  })
+})
+
+describe('refreshTokenGrant', () => {
+  it('returns the tokenSet', async () => {
+    const issuer: Issuer = new Issuer({
+      issuer: 'https://twitter.com',
+      authorization_endpoint: 'https://twitter.com/i/oauth2/authorize',
+      token_endpoint: 'https://api.twitter.com/2/oauth2/token'
+    })
+    const client: BaseClient = new issuer.Client({
+      client_id: 'TEST_CLIENT_ID',
+      client_secret: 'TEST_CLIENT_SECRET',
+      redirect_uris: ['TEST_REDIRECT_URI'],
+    });
+    const mockRequest = {
+      method: 'GET',
+      url: 'http://localhost/cb?code=TEST_CODE&state=TEST_STATE',
+      session: {
+        tokenSet: {
+          token_type: 'bearer',
+          access_token: 'TEST-ACCESS-TOKEN',
+          refresh_token: 'TEST-REFRESH-TOKEN'
+        }
+      }
+    } as unknown as express.Request;
+    const tokenSet = await refreshTokenGrant(mockRequest, client);
+    expect(tokenSet.token_type).toBe('bearer')
+    expect(tokenSet.expires_at).toBe(1095379198)
+    expect(tokenSet.access_token).toBe('TEST_ACCESS_TOKEN')
+    expect(tokenSet.scope).toBe('TEST_SCOPE')
+    expect(tokenSet.refresh_token).toBe('TEST_REFRESH_TOKEN')
+  })
+
+  it('returns error when tokenSet is not set.', async () => {
+    const issuer: Issuer = new Issuer({
+      issuer: 'https://twitter.com',
+      authorization_endpoint: 'https://twitter.com/i/oauth2/authorize',
+      token_endpoint: 'https://api.twitter.com/2/oauth2/token'
+    })
+    const client: BaseClient = new issuer.Client({
+      client_id: 'TEST_CLIENT_ID',
+      client_secret: 'TEST_CLIENT_SECRET',
+      redirect_uris: ['TEST_REDIRECT_URI'],
+    });
+    const mockRequest = {
+      method: 'GET',
+      url: 'http://localhost/cb?code=TEST_CODE&state=TEST_STATE',
+      session: {
+      }
+    } as unknown as express.Request;
+    expect(() =>
+      refreshTokenGrant(mockRequest, client)
+    ).rejects.toThrow(/^Refresh Token is missing$/);
+  })
+
+  it('returns error when refresh_token is not set.', async () => {
+    const issuer: Issuer = new Issuer({
+      issuer: 'https://twitter.com',
+      authorization_endpoint: 'https://twitter.com/i/oauth2/authorize',
+      token_endpoint: 'https://api.twitter.com/2/oauth2/token'
+    })
+    const client: BaseClient = new issuer.Client({
+      client_id: 'TEST_CLIENT_ID',
+      client_secret: 'TEST_CLIENT_SECRET',
+      redirect_uris: ['TEST_REDIRECT_URI'],
+    });
+    const mockRequest = {
+      method: 'GET',
+      url: 'http://localhost/cb?code=TEST_CODE&state=TEST_STATE',
+      session: {
+        tokenSet: {
+        }
+      }
+    } as unknown as express.Request;
+    expect(() =>
+      refreshTokenGrant(mockRequest, client)
+    ).rejects.toThrow(/^Refresh Token is missing$/);
   })
 })
 

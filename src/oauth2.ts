@@ -193,3 +193,17 @@ export async function tokenRequest(req: Request, client: BaseClient, options: To
   const tokenSet = await client.oauthCallback(options.redirect_uri, params, { code_verifier: codeVerifier, state }, { exchangeBody: { client_id: options.client_id } });
   return tokenSet;
 }
+
+/**
+ * Refreshing an Access Token.
+ * 
+ * @param {Request} req 
+ * @param {BaseClient} client 
+ * @returns {Promise<TokenSet>}
+ */
+export async function refreshTokenGrant(req: Request, client: BaseClient): Promise<TokenSet> {
+  if (!req.session.tokenSet || !req.session.tokenSet.refresh_token)
+    throw new Error('Refresh Token is missing');
+  const tokenSet = await client.refresh(req.session.tokenSet.refresh_token)
+  return tokenSet;
+}
