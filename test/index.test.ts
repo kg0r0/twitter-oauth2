@@ -28,8 +28,6 @@ beforeEach(() => {
 
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   res.status(err.status || 500).json({ err: { message: err.message } });
-  next()
-  return
 };
 
 describe('TwitterOAuth2', () => {
