@@ -42,7 +42,7 @@ describe('TwitterOAuth2', () => {
   })
 
   it('redirects the resource owner to twitter when client_type is public.', done => {
-    const app = App({
+    const app: express.Express = App({
       client_id: 'TEST_CLIENT_ID',
       redirect_uri: 'TEST_REDIRECT_URI',
       client_type: 'public'
@@ -64,7 +64,7 @@ describe('TwitterOAuth2', () => {
       saveUninitialized: true
     }))
     try {
-      app.use(twitterOAuth2());
+      app.use(twitterOAuth2() as express.RequestHandler);
     } catch (err) {
       expect(err).toBeUndefined();
     }
@@ -82,7 +82,7 @@ describe('TwitterOAuth2', () => {
       saveUninitialized: true
     }))
     app.use(twitterOAuth2({
-    }))
+    }) as express.RequestHandler)
     app.get('/user', (req: express.Request, res: express.Response) => {
       res.status(200).json({ name: 'john' });
     });
@@ -110,7 +110,7 @@ describe('TwitterOAuth2', () => {
     }))
     app.use(twitterOAuth2({
       client_id: 'TEST_CLIENT_ID',
-    }))
+    }) as express.RequestHandler)
     app.get('/user', (req: express.Request, res: express.Response) => {
       res.status(200).json({ name: 'john' });
     });
@@ -126,7 +126,7 @@ describe('TwitterOAuth2', () => {
   })
 
   it('returns a 403 status code when an asynchronous request is sent.', done => {
-    const app = App();
+    const app: express.Express = App();
     request(app)
       .get('/')
       .set('X-Requested-With', 'XMLHttpRequest')
@@ -140,7 +140,7 @@ describe('TwitterOAuth2', () => {
       client_id: 'TEST_CLIENT_ID',
       client_secret: 'TEST_CLIENT_SECRET',
       redirect_uri: 'TEST_REDIRECT_URI'
-    }))
+    }) as express.RequestHandler)
     app.get('/user', (req: express.Request, res: express.Response) => {
       res.status(200).json({ name: 'john' });
     });
@@ -169,7 +169,7 @@ describe('TwitterOAuth2', () => {
     app.use(twitterOAuth2({
       client_secret: 'TEST_CLIENT_SECRET',
       redirect_uri: 'TEST_REDIRECT_URI'
-    }))
+    }) as express.RequestHandler)
     app.get('/user', (req: express.Request, res: express.Response) => {
       res.status(200).json({ name: 'john' });
     });
@@ -185,7 +185,7 @@ describe('TwitterOAuth2', () => {
   })
 
   it('returns a 200 status code (Client Credentials Grant).', done => {
-    const app = App({
+    const app: express.Express = App({
       consumer_key: 'TEST_CONSUMER_KEY',
       consumer_secret: 'TEST_CONSUMER_SECRET',
       grant_type: 'client_credentials'
@@ -206,7 +206,7 @@ describe('TwitterOAuth2', () => {
       consumer_key: 'TEST_CONSUMER_KEY',
       consumer_secret: 'TEST_CONSUMER_SECRET',
       grant_type: 'client_credentials'
-    }))
+    }) as express.RequestHandler)
     app.get('/user', (req: express.Request, res: express.Response) => {
       res.status(200).json({ name: 'john' });
     });
@@ -234,7 +234,7 @@ describe('TwitterOAuth2', () => {
     }))
     app.use(twitterOAuth2({
       grant_type: 'client_credentials'
-    }))
+    }) as express.RequestHandler)
     app.get('/user', (req: express.Request, res: express.Response) => {
       res.status(200).json({ name: 'john' });
     });
@@ -263,7 +263,7 @@ describe('TwitterOAuth2', () => {
     app.use(twitterOAuth2({
       consumer_key: 'TEST_CONSUMER_KEY',
       grant_type: 'client_credentials'
-    }))
+    })as express.RequestHandler)
     app.get('/user', (req: express.Request, res: express.Response) => {
       res.status(200).json({ name: 'john' });
     });
@@ -297,6 +297,6 @@ function App(twitterOAuth2Options?: TwitterOAuth2Options, sessionOptions?: sessi
     client_secret: 'TEST_CLIENT_SECRET',
     consumer_secret: 'TEST_CONSUMER_SECRET',
     redirect_uri: 'TEST_REDIRECT_URI',
-  }));
+  }) as express.RequestHandler);
   return app
 }
