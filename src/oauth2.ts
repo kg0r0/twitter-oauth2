@@ -1,6 +1,14 @@
 import { Request, Response } from 'express';
 import { NextFunction } from 'connect';
-import { Issuer, generators, IssuerMetadata, BaseClient, TokenSet } from 'openid-client';
+import * as client from 'openid-client';
+
+interface TokenSet {
+  token_type: string;
+  access_token: string;
+  expires_at?: number;
+  scope?: string;
+  refresh_token?: string;
+}
 
 declare module 'express-session' {
   export interface SessionData {
@@ -58,28 +66,23 @@ export async function authorizationCodeGrant(options: TwitterOAuth2Options, req:
     if (typeof redirectURI != 'string')
       throw new Error('redirect_uri must be a string');
 
-    const issOpt: IssuerMetadata = {
+    const serverMetadata: client.ServerMetadata = {
       issuer: 'https://twitter.com',
       authorization_endpoint: 'https://twitter.com/i/oauth2/authorize',
-      token_endpoint: 'https://api.twitter.com/2/oauth2/token'
-    }
-    const issuer: Issuer = new Issuer(issOpt);
-    const client: BaseClient = new issuer.Client({
-      client_id: clientID,
-      client_secret: clientSecret,
-      redirect_uris: [redirectURI],
-      token_endpoint_auth_method: options.client_type == 'public' ? 'none' : 'client_secret_basic',
-    });
+      token_endpoint: 'https://api.twitter.com/2/oauth2/token',
+    };
+    const clientAuth = options.client_type == 'public' ? client.None() : client.ClientSecretBasic(clientSecret!);
+    const config = new client.Configuration(serverMetadata, clientID, { redirect_uri: redirectURI }, clientAuth);
     if ((!req.session.isRedirected && !req.session.tokenSet)) {
-      const state = generators.state();
-      const codeVerifier = generators.codeVerifier();
-      const codeChallenge = generators.codeChallenge(codeVerifier);
-      const url = authorizationRequest(client, {
+      const state = client.randomState();
+      const codeVerifier = client.randomPKCECodeVerifier();
+      const codeChallenge = await client.calculatePKCECodeChallenge(codeVerifier);
+      const url = client.buildAuthorizationUrl(config, {
         state,
-        scope: options.scope,
+        scope: options.scope || 'tweet.read users.read offline.access',
         code_challenge: codeChallenge,
         code_challenge_method: 'S256',
-      })
+      }).toString();
       req.session.state = state;
       req.session.code_verifier = codeVerifier;
       req.session.originalUrl = req.originalUrl;
@@ -95,11 +98,11 @@ export async function authorizationCodeGrant(options: TwitterOAuth2Options, req:
       const codeVerifier = req.session.code_verifier;
       if (typeof codeVerifier != 'string')
         throw new Error('code_verifier must be a string');
-      const tokenSet = await tokenRequest(req, client, {
-        redirect_uri: redirectURI,
-        client_id: clientID,
-        code_verifier: codeVerifier,
-        state: state,
+      const host = req.headers.host || 'localhost';
+      const currentUrl = new URL(req.url!, `http://${host}`);
+      const tokenSet = await client.authorizationCodeGrant(config, currentUrl, {
+        pkceCodeVerifier: codeVerifier,
+        expectedState: state,
       });
       req.session.tokenSet = tokenSet;
       if (typeof req.session.originalUrl != 'string')
@@ -140,17 +143,16 @@ export async function clientCredentialsGrant(options: TwitterOAuth2Options, req:
     const clientSecret = options.consumer_secret || process.env.CONSUMER_SECRET;
     if (typeof clientSecret != 'string')
       throw new Error('consumer_secret must be a string');
-    const issuer = new Issuer({
+    const serverMetadata: client.ServerMetadata = {
       issuer: 'https://twitter.com',
-      token_endpoint: 'https://api.twitter.com/oauth2/token'
-    });
-    const client = new issuer.Client({
-      client_id: clientID,
-      client_secret: clientSecret,
-    });
-    const tokenSet = await client.grant({
-      grant_type: 'client_credentials',
-    })
+      token_endpoint: 'https://api.twitter.com/oauth2/token',
+    };
+    const config = new client.Configuration(serverMetadata, clientID, clientSecret);
+    const params: Record<string, string> = {};
+    if (options.scope) {
+      params.scope = options.scope;
+    }
+    const tokenSet = await client.clientCredentialsGrant(config, params);
     req.session.tokenSet = tokenSet;
     next();
     return
@@ -160,36 +162,6 @@ export async function clientCredentialsGrant(options: TwitterOAuth2Options, req:
   }
 }
 
-/**
- * Returns a Authorization Request URL.
- * 
- * @param {BaseClient} client 
- * @param {AuthorizationRequestOptions} options 
- * @returns {string}
- */
-export function authorizationRequest(client: BaseClient, options: AuthorizationRequestOptions): string {
-  const url: string = client.authorizationUrl({
-    response_type: 'code',
-    scope: options.scope || 'tweet.read users.read offline.access',
-    state: options.state,
-    code_challenge: options.code_challenge,
-    code_challenge_method: options.code_challenge_method
-  });
-  return url;
-}
+// Helper function is no longer needed - functionality moved inline
 
-/**
- * Returns a Token Response.
- * 
- * @param {Request} req 
- * @param {BaseClient} client 
- * @param {TokenRequestOptions} options 
- * @returns {Promise<TokenSet>}
- */
-export async function tokenRequest(req: Request, client: BaseClient, options: TokenRequestOptions): Promise<TokenSet> {
-  const state = options.state;
-  const codeVerifier = options.code_verifier;
-  const params = client.callbackParams(req);
-  const tokenSet = await client.oauthCallback(options.redirect_uri, params, { code_verifier: codeVerifier, state }, { exchangeBody: { client_id: options.client_id } });
-  return tokenSet;
-}
+// Helper function is no longer needed - functionality moved inline

@@ -9,4 +9,7 @@ module.exports = {
   "transform": {
     "^.+\\.(ts|tsx)$": "ts-jest"
   },
+  "moduleNameMapper": {
+    "^openid-client$": "<rootDir>/test/__mocks__/openid-client.js"
+  }
 }
